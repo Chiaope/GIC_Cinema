@@ -1,0 +1,1 @@
+python -m venv "venv_gic_cinema" && venv_gic_cinema\Scripts\activate && pip install . && python main.py

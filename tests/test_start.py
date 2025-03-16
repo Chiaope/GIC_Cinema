@@ -1,79 +1,63 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 from io import StringIO
 
-from src import start
+from src.start import options_selection_request
+from src.custom_exception import BreakOutOfLoop
 
 
-class TestMain(unittest.TestCase):
-    # @patch("builtins.input")
-    # @patch("sys.stdout", new_callable=StringIO)
-    # def test_main(self, mock_stdout, mock_input):
-    #     # Simulate user input
-    #     mock_input.side_effect = [
-    #         "Avengers 5 10",  # Initial input: title, rows, seats_per_row
-    #         "1",               # Book tickets
-    #         "2",               # Number of tickets
-    #         "",                # Default seat
-    #         "2",               # Check bookings
-    #         "3",               # Exit
-    #     ]
-
-    #     # Call the main function
-    #     start.start()
-
-    #     # Capture the output
-    #     output = mock_stdout.getvalue()
-
-    #     # Assert expected output
-    #     self.assertIn("Welcome to GIC Cinemas", output)
-    #     self.assertIn("Bookings: A01, A02", output)
-    #     self.assertIn(
-    #         "Thank you for using GIC Cinemas Booking System!", output)
+class TestOptionsSelectionRequest(unittest.TestCase):
+    def setUp(self):
+        """
+        Initialise a mock cinema instance
+        """
+        self.cinema = MagicMock()
+        self.cinema.title = 'Mock_Movie_Title'
+        self.cinema.get_seats_available.return_value = 50
+        self.cinema.optional_1_process = lambda: print('Ran Option 1 Process')
+        self.cinema.optional_2_process = lambda: print('Ran Option 2 Process')
+        self.cinema.optional_3_process = lambda: print('Ran Option 3 Process')
 
     @patch("builtins.input")
     @patch("sys.stdout", new_callable=StringIO)
-    def test_invalid_initalisation(self, mock_stdout, mock_input):
-        mock_input.side_effect = ["not a movie and seats", "Valid 1 2", "3"]
-        std_out = mock_stdout.getvalue()
-        start.start()
-        self.assertEqual('Invalid movie definition, please try again.', std_out.split('\n'))
-        
-    # @patch("builtins.input")
-    # @patch("sys.stdout", new_callable=StringIO)
-    # def test_valid_initalisation(self, mock_stdout, mock_input):
-    #     mock_input.side_effect = "1"
-    #     std_out = mock_stdout.getvalue()
-    #     self.assertEqual('', std_out)
+    def test_options_selection_request_non_numeric_input(self, mock_stdout, mock_input):
+        mock_input.side_effect = ['non_numeric_input', BreakOutOfLoop()]
+        options_selection_request(self.cinema)
+        std_out = mock_stdout.getvalue().split('\n')
+        self.assertIn("Invalid option. Try again.", std_out)
 
-    # @patch("builtins.input")
-    # @patch("sys.stdout", new_callable=StringIO)
-    # def test_invalid_input_selected(self, mock_stdout, mock_input):
-    #     mock_input.side_effect = "abc"
-    #     std_out = mock_stdout.getvalue()
-    #     self.assertEqual('', std_out)
+    @patch("builtins.input")
+    @patch("sys.stdout", new_callable=StringIO)
+    def test_options_selection_request_invalid_number_input(self, mock_stdout, mock_input):
+        mock_input.side_effect = ['999', BreakOutOfLoop()]
+        options_selection_request(self.cinema)
+        std_out = mock_stdout.getvalue().split('\n')
+        self.assertIn("Invalid option. Try again.", std_out)
+
+    @patch("builtins.input")
+    @patch("sys.stdout", new_callable=StringIO)
+    def test_options_selection_request_number_1_input(self, mock_stdout, mock_input):
+        mock_input.side_effect = ['1', BreakOutOfLoop()]
+        options_selection_request(self.cinema)
+        std_out = mock_stdout.getvalue().split('\n')
+        self.assertIn("Ran Option 1 Process", std_out)
+
+    @patch("builtins.input")
+    @patch("sys.stdout", new_callable=StringIO)
+    def test_options_selection_request_number_2_input(self, mock_stdout, mock_input):
+        mock_input.side_effect = ['2', BreakOutOfLoop()]
+        options_selection_request(self.cinema)
+        std_out = mock_stdout.getvalue().split('\n')
+        self.assertIn("Ran Option 2 Process", std_out)
+
+    @patch("builtins.input")
+    @patch("sys.stdout", new_callable=StringIO)
+    def test_options_selection_request_number_3_input(self, mock_stdout, mock_input):
+        mock_input.side_effect = ['3', BreakOutOfLoop()]
+        options_selection_request(self.cinema)
+        std_out = mock_stdout.getvalue().split('\n')
+        self.assertIn("Ran Option 3 Process", std_out)
 
 
-    # @patch("builtins.input")
-    # @patch("sys.stdout", new_callable=StringIO)
-    # def test_input_1_selected(self, mock_stdout, mock_input):
-    #     mock_input.side_effect = "1"
-    #     std_out = mock_stdout.getvalue()
-    #     self.assertEqual('', std_out)
-
-    # @patch("builtins.input")
-    # @patch("sys.stdout", new_callable=StringIO)
-    # def test_input_2_selected(self, mock_stdout, mock_input):
-    #     mock_input.side_effect = "2"
-    #     std_out = mock_stdout.getvalue()
-    #     self.assertEqual('', std_out)
-
-    # @patch("builtins.input")
-    # @patch("sys.stdout", new_callable=StringIO)
-    # def test_input_3_selected(self, mock_stdout, mock_input):
-    #     mock_input.side_effect = "3"    
-    #     std_out = mock_stdout.getvalue()
-    #     self.assertEqual('', std_out)
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

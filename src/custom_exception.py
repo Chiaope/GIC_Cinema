@@ -1,6 +1,6 @@
-class BackToMainMenu(Exception):
+class BreakOutOfLoop(Exception):
     """
-    Used as a break to reset to main menu
+    Used to break out of the application loop
     """
     def __init__(self):
         super().__init__()

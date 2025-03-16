@@ -31,23 +31,28 @@ def number_of_ticket_request(available_count: int):
             num_tickets = int(num_tickets)
             if num_tickets > available_count:
                 raise NotEnoughSeatsException(available_count)
+            if num_tickets < 1:
+                raise ValueError
             return num_tickets
         except ValueError:
             print('Invalid input, please try again.')
         except NotEnoughSeatsException as e:
             print(e)
         
-def select_seat_request():
+def select_seat_request(row_count, col_count):
     while True:
         try:
             selected_seat = input("Enter blank to accept seat selection, or enter new seating position\n")
             if selected_seat == '':
                 return
             row_selected = selected_seat[0].upper()
-            col_selected = int(selected_seat[1:])
+            col_selected = int(selected_seat[1:])-1
             if not row_selected.isalpha():
                 raise ValueError
-            return [convert_alphabet_index(row_selected), col_selected-1]
+            row_selected = convert_alphabet_index(row_selected)
+            if row_selected < 0 or row_selected >= row_count or col_selected < 0 or col_selected >= col_count:
+                raise ValueError
+            return [row_selected, col_selected]
         except ValueError:
             print('Invalid input, please try again.')
 

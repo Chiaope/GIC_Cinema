@@ -3,7 +3,7 @@ import uuid
 
 from pydantic import validate_call
 
-from src.custom_exception import BreakOutOfLoop, NotEnoughSeatsException
+from src.custom_exception import BreakOutOfLoop
 from src.request_user_input import number_of_ticket_request, select_seat_request
 
 
@@ -32,9 +32,6 @@ class Cinema:
             return
         print(f'Successfully reserved {num_tickets} {self.title} tickets.')
         self.reserve_seats(num_tickets)
-        # start_seat = start_seat if start_seat else None
-        # self.book_tickets(num_tickets, start_seat)
-        # self.display_seating()
         return
 
     def optional_2_process(self):
@@ -59,7 +56,7 @@ class Cinema:
             print(f'Booking id: {booking_id}')
             print('Selected seats:')
             self.display_seating(reserved_seat_mapping)
-            user_select_seat_input = select_seat_request()
+            user_select_seat_input = select_seat_request(self.rows, self.seats_per_row)
             if not user_select_seat_input:
                 self.bookings[booking_id] = selected_seats
                 for row, col in selected_seats:

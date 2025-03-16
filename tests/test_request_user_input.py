@@ -74,6 +74,24 @@ class TestNumberOfTicketRequest(unittest.TestCase):
             number_of_ticket_request(self.seats_available)
         std_out = mock_stdout.getvalue().split('\n')
         self.assertIn(f"Sorry, there are only {self.seats_available} seats available.", std_out)
+        
+    @patch("builtins.input")
+    @patch("sys.stdout", new_callable=StringIO)
+    def test_number_of_ticket_request_negative_number_input(self, mock_stdout, mock_input):
+        mock_input.side_effect = ['-5', BreakOutOfLoop()]
+        with self.assertRaises(BreakOutOfLoop):
+            number_of_ticket_request(self.seats_available)
+        std_out = mock_stdout.getvalue().split('\n')
+        self.assertIn("Invalid input, please try again.", std_out)
+        
+    @patch("builtins.input")
+    @patch("sys.stdout", new_callable=StringIO)
+    def test_number_of_ticket_request_float_number_input(self, mock_stdout, mock_input):
+        mock_input.side_effect = ['10.123', BreakOutOfLoop()]
+        with self.assertRaises(BreakOutOfLoop):
+            number_of_ticket_request(self.seats_available)
+        std_out = mock_stdout.getvalue().split('\n')
+        self.assertIn("Invalid input, please try again.", std_out)
 
     @patch("builtins.input")
     def test_number_of_ticket_request_blank_input(self, mock_input):
@@ -89,12 +107,16 @@ class TestNumberOfTicketRequest(unittest.TestCase):
 
 
 class TestSpecificSeatRequest(unittest.TestCase):
+    def setUp(self):
+        self.row_count = 5
+        self.col_count = 5
+    
     @patch("builtins.input")
     @patch("sys.stdout", new_callable=StringIO)
     def test_number_of_ticket_request_invalid_input(self, mock_stdout, mock_input):
         mock_input.side_effect = ['definitely not a seat', BreakOutOfLoop()]
         with self.assertRaises(BreakOutOfLoop):
-            select_seat_request()
+            select_seat_request(self.row_count, self.col_count)
         std_out = mock_stdout.getvalue().split('\n')
         self.assertIn("Invalid input, please try again.", std_out)
         
@@ -103,7 +125,7 @@ class TestSpecificSeatRequest(unittest.TestCase):
     def test_number_of_ticket_request_too_many_seats_input(self, mock_stdout, mock_input):
         mock_input.side_effect = ['B3 B4 B5', BreakOutOfLoop()]
         with self.assertRaises(BreakOutOfLoop):
-            select_seat_request()
+            select_seat_request(self.row_count, self.col_count)
         std_out = mock_stdout.getvalue().split('\n')
         self.assertIn("Invalid input, please try again.", std_out)
 
@@ -112,20 +134,20 @@ class TestSpecificSeatRequest(unittest.TestCase):
     def test_number_of_ticket_request_invalid_seats_input(self, mock_stdout, mock_input):
         mock_input.side_effect = ['ABC33', BreakOutOfLoop()]
         with self.assertRaises(BreakOutOfLoop):
-            select_seat_request()
+            select_seat_request(self.row_count, self.col_count)
         std_out = mock_stdout.getvalue().split('\n')
         self.assertIn("Invalid input, please try again.", std_out)
 
     @patch("builtins.input")
     def test_number_of_ticket_request_blank_input(self, mock_input):
         mock_input.side_effect = ['']
-        results = select_seat_request()
+        results = select_seat_request(self.row_count, self.col_count)
         self.assertEqual(None, results)
 
     @patch("builtins.input")
     def test_number_of_ticket_request_valid_input(self, mock_input):
         mock_input.side_effect = ['B3']
-        results = select_seat_request()
+        results = select_seat_request(self.row_count, self.col_count)
         self.assertEqual([1, 2], results)
 
 

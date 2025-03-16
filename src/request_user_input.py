@@ -1,13 +1,18 @@
 from pydantic import validate_call
-
 from src.custom_exception import NotEnoughSeatsException
 from src.util.convert_alphabet_index import convert_alphabet_index
 
 
-def initalise_movie_request():
-    """Ask user for inputs in order to initialise the cinema
+def initalise_movie_request() -> tuple:
+    """
+    Ask user for inputs in order to initialise the cinema
+
+
+    Raises:
+        ValueError: When number of rows provided is more than the number of alphabets or when the input is invalid
+
     Returns:
-        tuple: (Movie title, Number of rows in the cinema, Number of seats in each row in the cinema)
+        tuple (title, rows, seats_per_row): Returns the movie title, number of rows in the cinema, number of seats per row in the cinema
     """
     while True:
         try:
@@ -23,7 +28,21 @@ def initalise_movie_request():
             print('Invalid input, please try again.')
 
 
-def number_of_ticket_request(available_count: int):
+@validate_call
+def number_of_ticket_request(available_count: int) -> int:
+    """
+    Ask user for the number of tickets needed
+
+    Args:
+        available_count (int): The number of seats remaining
+
+    Raises:
+        NotEnoughSeatsException: When the requested number of tickets is more than the number of seats available
+        ValueError: When the input is invalid
+
+    Returns:
+        int: Number of tickets requested by the user
+    """
     while True:
         try:
             num_tickets = input(
@@ -42,7 +61,21 @@ def number_of_ticket_request(available_count: int):
             print(e)
 
 
-def select_seat_request(row_count, col_count):
+@validate_call
+def select_seat_request(row_count: int, col_count: int) -> tuple:
+    """
+    Ask user for the prefered seat position
+
+    Args:
+        row_count (int): Number of rows in the cinema
+        col_count (int): Number of seats per row in the cinema
+
+    Raises:
+        ValueError: When the input seating position is not valid
+
+    Returns:
+        tuple (row_selected, col_selected): Returns the position of the seat position selected in their index form
+    """
     while True:
         try:
             selected_seat = input(
@@ -56,13 +89,25 @@ def select_seat_request(row_count, col_count):
             row_selected = convert_alphabet_index(row_selected)
             if row_selected < 0 or row_selected >= row_count or col_selected < 0 or col_selected >= col_count:
                 raise ValueError
-            return [row_selected, col_selected]
+            return (row_selected, col_selected)
         except ValueError:
             print('Invalid input, please try again.')
 
 
 @validate_call
-def booking_id_request(bookings: dict):
+def booking_id_request(bookings: dict) -> str:
+    """
+    Ask user for the booking id
+
+    Args:
+        bookings (dict): All the available bookings
+
+    Raises:
+        ValueError: When the booking id provided is invalid
+
+    Returns:
+        str: Returns the booking id that the user have provided
+    """
     while True:
         try:
             booking_id = input(
@@ -71,6 +116,6 @@ def booking_id_request(bookings: dict):
                 return
             if booking_id not in bookings.keys():
                 raise ValueError
-            return bookings[booking_id]
+            return booking_id
         except ValueError:
             print('Invalid input, please try again.')

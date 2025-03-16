@@ -147,7 +147,7 @@ class TestSpecificSeatRequest(unittest.TestCase):
     def test_number_of_ticket_request_valid_input(self, mock_input):
         mock_input.side_effect = ['B3']
         results = select_seat_request(self.row_count, self.col_count)
-        self.assertEqual([1, 2], results)
+        self.assertEqual((1, 2), results)
 
 
 class TestBookingIDRequest(unittest.TestCase):
@@ -176,8 +176,11 @@ class TestBookingIDRequest(unittest.TestCase):
     def test_booking_id_request_correct_booking_id_input(self, mock_input):
         mock_input.side_effect = ['GIC0001']
         results = booking_id_request(self.bookings)
-        self.assertEqual(['B5,B6'], results)
+        self.assertEqual('GIC0001', results)
 
 
 if __name__ == '__main__':
+    # suite = unittest.TestLoader().loadTestsFromTestCase(TestNumberOfTicketRequest)
+    # unittest.TextTestRunner().run(suite)
+
     unittest.main()

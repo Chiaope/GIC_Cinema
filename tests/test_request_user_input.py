@@ -51,12 +51,10 @@ class TestInitialiseMovieRequest(unittest.TestCase):
         self.assertEqual(('movie_title', 5, 10), results)
 
 
-
-
 class TestNumberOfTicketRequest(unittest.TestCase):
     def setUp(self):
         self.seats_available = 10
-    
+
     @patch("builtins.input")
     @patch("sys.stdout", new_callable=StringIO)
     def test_number_of_ticket_request_non_number_input(self, mock_stdout, mock_input):
@@ -73,8 +71,9 @@ class TestNumberOfTicketRequest(unittest.TestCase):
         with self.assertRaises(BreakOutOfLoop):
             number_of_ticket_request(self.seats_available)
         std_out = mock_stdout.getvalue().split('\n')
-        self.assertIn(f"Sorry, there are only {self.seats_available} seats available.", std_out)
-        
+        self.assertIn(
+            f"Sorry, there are only {self.seats_available} seats available.", std_out)
+
     @patch("builtins.input")
     @patch("sys.stdout", new_callable=StringIO)
     def test_number_of_ticket_request_negative_number_input(self, mock_stdout, mock_input):
@@ -83,7 +82,7 @@ class TestNumberOfTicketRequest(unittest.TestCase):
             number_of_ticket_request(self.seats_available)
         std_out = mock_stdout.getvalue().split('\n')
         self.assertIn("Invalid input, please try again.", std_out)
-        
+
     @patch("builtins.input")
     @patch("sys.stdout", new_callable=StringIO)
     def test_number_of_ticket_request_float_number_input(self, mock_stdout, mock_input):
@@ -110,7 +109,7 @@ class TestSpecificSeatRequest(unittest.TestCase):
     def setUp(self):
         self.row_count = 5
         self.col_count = 5
-    
+
     @patch("builtins.input")
     @patch("sys.stdout", new_callable=StringIO)
     def test_number_of_ticket_request_invalid_input(self, mock_stdout, mock_input):
@@ -119,7 +118,7 @@ class TestSpecificSeatRequest(unittest.TestCase):
             select_seat_request(self.row_count, self.col_count)
         std_out = mock_stdout.getvalue().split('\n')
         self.assertIn("Invalid input, please try again.", std_out)
-        
+
     @patch("builtins.input")
     @patch("sys.stdout", new_callable=StringIO)
     def test_number_of_ticket_request_too_many_seats_input(self, mock_stdout, mock_input):
@@ -154,7 +153,7 @@ class TestSpecificSeatRequest(unittest.TestCase):
 class TestBookingIDRequest(unittest.TestCase):
     def setUp(self):
         self.bookings = {'GIC0001': ['B5,B6'], 'GIC0002': ['C5,C6']}
-    
+
     @patch("builtins.input")
     @patch("sys.stdout", new_callable=StringIO)
     def test_booking_id_request_invalid_input(self, mock_stdout, mock_input):
@@ -163,7 +162,7 @@ class TestBookingIDRequest(unittest.TestCase):
             booking_id_request(self.bookings)
         std_out = mock_stdout.getvalue().split('\n')
         self.assertIn("Invalid input, please try again.", std_out)
-        
+
     @patch("builtins.input")
     @patch("sys.stdout", new_callable=StringIO)
     def test_booking_id_request_incorrect_booking_id_input(self, mock_stdout, mock_input):
@@ -181,7 +180,4 @@ class TestBookingIDRequest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    # suite = unittest.TestLoader().loadTestsFromTestCase(TestNumberOfTicketRequest)
-    # unittest.TextTestRunner().run(suite)
-    
     unittest.main()

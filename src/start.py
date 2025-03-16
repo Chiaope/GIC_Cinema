@@ -30,8 +30,8 @@ def options_selection_request(cinema: Cinema):
         except BreakOutOfLoop:
             return
 
+
 def start():
     title, rows, seats_per_row = initalise_movie_request()
     cinema = Cinema(title, rows, seats_per_row)
     options_selection_request(cinema)
-    

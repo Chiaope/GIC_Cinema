@@ -32,5 +32,6 @@ class TestCinema(unittest.TestCase):
     def test_valid_manual_seat_selection(self):
         pass
 
+
 if __name__ == '__main__':
     unittest.main()

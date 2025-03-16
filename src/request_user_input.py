@@ -11,7 +11,8 @@ def initalise_movie_request():
     """
     while True:
         try:
-            initialisation_config = input("Please define movie title and seating map in [Title] [Row] [SeatsPerRow] format:\n")
+            initialisation_config = input(
+                "Please define movie title and seating map in [Title] [Row] [SeatsPerRow] format:\n")
             title, rows, seats_per_row = initialisation_config.split()
             rows = int(rows)
             seats_per_row = int(seats_per_row)
@@ -25,7 +26,8 @@ def initalise_movie_request():
 def number_of_ticket_request(available_count: int):
     while True:
         try:
-            num_tickets = input("Enter number of tickets to book, or enter blank to go back to main menu:\n")
+            num_tickets = input(
+                "Enter number of tickets to book, or enter blank to go back to main menu:\n")
             if num_tickets == '':
                 return
             num_tickets = int(num_tickets)
@@ -38,11 +40,13 @@ def number_of_ticket_request(available_count: int):
             print('Invalid input, please try again.')
         except NotEnoughSeatsException as e:
             print(e)
-        
+
+
 def select_seat_request(row_count, col_count):
     while True:
         try:
-            selected_seat = input("Enter blank to accept seat selection, or enter new seating position\n")
+            selected_seat = input(
+                "Enter blank to accept seat selection, or enter new seating position\n")
             if selected_seat == '':
                 return
             row_selected = selected_seat[0].upper()
@@ -56,11 +60,13 @@ def select_seat_request(row_count, col_count):
         except ValueError:
             print('Invalid input, please try again.')
 
+
 @validate_call
 def booking_id_request(bookings: dict):
     while True:
         try:
-            booking_id = input("Enter booking id, or enter blank to go back to main menu:\n").upper()
+            booking_id = input(
+                "Enter booking id, or enter blank to go back to main menu:\n").upper()
             if booking_id == '':
                 return
             if booking_id not in bookings.keys():

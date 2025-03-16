@@ -51,12 +51,14 @@ class Cinema:
 
     def reserve_seats(self, num_tickets):
         booking_id = self.generate_booking_id()
-        selected_seats, reserved_seat_mapping = self.default_generate_reserve_seat_mapping(num_tickets)
+        selected_seats, reserved_seat_mapping = self.default_generate_reserve_seat_mapping(
+            num_tickets)
         while True:
             print(f'Booking id: {booking_id}')
             print('Selected seats:')
             self.display_seating(reserved_seat_mapping)
-            user_select_seat_input = select_seat_request(self.rows, self.seats_per_row)
+            user_select_seat_input = select_seat_request(
+                self.rows, self.seats_per_row)
             if not user_select_seat_input:
                 self.bookings[booking_id] = selected_seats
                 for row, col in selected_seats:
@@ -64,14 +66,16 @@ class Cinema:
                 return
             selected_row = user_select_seat_input[0]
             selected_col = user_select_seat_input[1]
-            selected_seats, reserved_seat_mapping = self.selected_seat_generate_reserve_seat_mapping(num_tickets, selected_row, selected_col)
-    
+            selected_seats, reserved_seat_mapping = self.selected_seat_generate_reserve_seat_mapping(
+                num_tickets, selected_row, selected_col)
+
     def selected_seat_generate_reserve_seat_mapping(self, num_tickets, selected_row, selected_col):
         selected_seats = []
         row = selected_row
         col = selected_col
         cols = self.seats_per_row
-        seating = deepcopy(self.seating) # Since nothing is confirmed yet so we make a copy instead of actually updating it
+        # Since nothing is confirmed yet so we make a copy instead of actually updating it
+        seating = deepcopy(self.seating)
         # Try to fill up entire row 1st
         while num_tickets > 0 and col < self.seats_per_row:
             if seating[row][col] == '.':
@@ -79,55 +83,55 @@ class Cinema:
                 seating[row][col] = 'o'
                 selected_seats.append((row, col))
             col += 1
-        
+
         # Fill up the remaining seats
         while num_tickets > 0:
             row -= 1
-            if row < 0: # Resets to the furthest row if there are not enough space in front anymore
-                row = self.rows -1
-            mid = cols// 2
+            if row < 0:  # Resets to the furthest row if there are not enough space in front anymore
+                row = self.rows - 1
+            mid = cols // 2
             left, right = mid, mid
             while num_tickets > 0 and (left >= 0 or right < cols):
                 if left >= 0 and seating[row][left] == '.':
                     seating[row][left] = 'o'
                     selected_seats.append((row, left))
                     num_tickets -= 1
-                
+
                 if num_tickets > 0 and right < cols and seating[row][right] == '.':
                     seating[row][right] = 'o'
                     selected_seats.append((row, right))
                     num_tickets -= 1
-                
+
                 left -= 1
                 right += 1
-            
+
         return selected_seats, seating
 
     def default_generate_reserve_seat_mapping(self, num_tickets):
         selected_seats = []
-        
+
         row = self.rows - 1
         cols = self.seats_per_row
         seating = deepcopy(self.seating)
-        
+
         while num_tickets > 0 and row >= 0:
             mid = cols // 2
             left, right = mid, mid
-            
+
             while num_tickets > 0 and (left >= 0 or right < cols):
                 if left >= 0 and seating[row][left] == '.':
                     seating[row][left] = 'o'
                     selected_seats.append((row, left))
                     num_tickets -= 1
-                
+
                 if num_tickets > 0 and right < cols and seating[row][right] == '.':
                     seating[row][right] = 'o'
                     selected_seats.append((row, right))
                     num_tickets -= 1
-                
+
                 left -= 1
                 right += 1
-            
+
             row -= 1
         return selected_seats, seating
 
@@ -184,9 +188,3 @@ class Cinema:
         else:
             for bid, seats in self.bookings.items():
                 print(f"Booking ID: {bid} - Seats: {', '.join(seats)}")
-
-
-if __name__ == '__main__':
-    abc = Cinema('movie', 5, 10)
-    derp = abc.generate_reserve_seat_mapping(8)
-    abc.display_seating()

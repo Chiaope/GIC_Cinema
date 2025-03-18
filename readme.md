@@ -36,8 +36,8 @@ Unzip the GIC_Cinema folder and open a terminal in the unzipped folder's path
 ```
 </details>
 
-
-Create python virtual environment, activate it and install all of the required dependencies
+## Start
+### Create python virtual environment, activate it and install all of the required dependencies
 
 ```bash
 python -m venv "venv_gic_cinema"
@@ -45,7 +45,7 @@ venv_gic_cinema\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Run the python program
+### Run the python program
 ```bash
 # Normal verion
 python GIC_Cinema.py

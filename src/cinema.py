@@ -2,13 +2,13 @@ from copy import deepcopy
 from pydantic import validate_call
 
 
-from src.custom_exception import BreakOutOfLoop
+from src.custom_exception import BreakOutOfLoop, NotEnoughSeatsException
 from src.request_user_input import booking_id_request, number_of_ticket_request, select_seat_request
 
 
 class Cinema:
     @validate_call
-    def __init__(self, title: str, rows: int, seats_per_row: int) -> None:
+    def __init__(self, title: str, rows: int, seats_per_row: int, updated: bool = False) -> None:
         """
         Initate Cinema with title, rows and seats per row
 
@@ -16,12 +16,14 @@ class Cinema:
             title (str): Title of the movie
             rows (int): Number of rows in the cinema
             seats_per_row (int): Number of seats per row in the cinema
+            updated (bool, optional):  Use updated manual selected seating arangement logic. Defaults to False.
         """
         self.booking_id_prep = 'GIC'
         self.booking_id_buffer = '0000'
         self.title = title
         self.rows = rows
         self.seats_per_row = seats_per_row
+        self.updated = updated
         self.seating = [["." for _ in range(seats_per_row)]
                         for _ in range(rows)]
         self.bookings = {}
@@ -41,6 +43,9 @@ class Cinema:
         When user wants to make a booking
         """
         seats_available = self.get_available_seat_count()
+        if seats_available <= 0:
+            print('There are no more seats.\n')
+            return
         num_tickets = number_of_ticket_request(seats_available)
         if not num_tickets:
             return
@@ -103,8 +108,11 @@ class Cinema:
                 return
             selected_row = user_select_seat_input[0]
             selected_col = user_select_seat_input[1]
-            selected_seats, reserved_seat_mapping = self.selected_seat_generate_reserve_seat_mapping(
-                num_tickets, selected_row, selected_col)
+            try:
+                selected_seats, reserved_seat_mapping = self.selected_seat_generate_reserve_seat_mapping(
+                    num_tickets, selected_row, selected_col)
+            except NotEnoughSeatsException as e:
+                print(f"{e.__str__()[:-1]} from the selected position.\n")
 
     @validate_call
     def selected_seat_generate_reserve_seat_mapping(self, num_tickets: int, selected_row: int, selected_col: int) -> tuple:
@@ -119,6 +127,7 @@ class Cinema:
         Returns:
             tuple (selected_seats, seating): Returns the selected seats and the seat reserved seat mapping
         """
+        num_tickets_wanted = num_tickets
         selected_seats = []
         row = selected_row
         col = selected_col
@@ -137,6 +146,8 @@ class Cinema:
         while num_tickets > 0:
             row -= 1
             if row < 0:  # Resets to the furthest row if there are not enough space in front anymore
+                if not self.updated:
+                    raise NotEnoughSeatsException(num_tickets_wanted-num_tickets)
                 row = self.rows - 1
             mid = cols // 2
             left, right = mid, mid

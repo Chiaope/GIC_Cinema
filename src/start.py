@@ -33,10 +33,13 @@ def options_selection_request(cinema: Cinema):
             return
 
 
-def start():
+def start(updated: bool = False):
     """
     Start the GIC cinema booking system
+
+    Args:
+        updated (bool, optional): Use updated manual selected seating arangement logic. Defaults to False.
     """
     title, rows, seats_per_row = initalise_movie_request()
-    cinema = Cinema(title, rows, seats_per_row)
+    cinema = Cinema(title, rows, seats_per_row, updated)
     options_selection_request(cinema)

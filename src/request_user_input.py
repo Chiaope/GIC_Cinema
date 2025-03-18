@@ -21,7 +21,7 @@ def initalise_movie_request() -> tuple:
             title, rows, seats_per_row = initialisation_config.split()
             rows = int(rows)
             seats_per_row = int(seats_per_row)
-            if rows > 26:
+            if rows > 26 or rows <= 0 or seats_per_row <= 0:
                 raise ValueError
             return title, rows, seats_per_row
         except ValueError:

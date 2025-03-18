@@ -1,10 +1,11 @@
+from io import StringIO
 import unittest
 from unittest.mock import MagicMock, patch
 
 from pydantic import ValidationError
 
 from src import cinema
-from src.custom_exception import BreakOutOfLoop
+from src.custom_exception import BreakOutOfLoop, NotEnoughSeatsException
 
 
 class TestCinema(unittest.TestCase):
@@ -56,6 +57,18 @@ class TestCinema(unittest.TestCase):
 
         self.assertIsNone(self.cinema.option_1_process())
 
+    @patch("sys.stdout", new_callable=StringIO)
+    @patch("builtins.input")
+    def test_option_1_process_not_enough_seats(self, mock_input, mock_stdout):
+        mock_available_seats = MagicMock()
+        mock_available_seats.return_value = 0
+        c = cinema.Cinema('not_enough_seats_movie', 5, 5)
+        c.get_available_seat_count = mock_available_seats
+        c.option_1_process()
+        std_out = mock_stdout.getvalue().split('\n')
+
+        self.assertIn("There are no more seats.", std_out)
+
     @patch(f"{cinema.__name__}.Cinema.generate_booking_id")
     @patch("builtins.input")
     def test_option_2_process_check_booking(self, mock_input, mock_generate_booking_id):
@@ -90,18 +103,71 @@ class TestCinema(unittest.TestCase):
         num_tickets = 5
         self.assertIsNone(self.cinema.reserve_seats(num_tickets))
 
+    @patch("builtins.input")
+    @patch("sys.stdout", new_callable=StringIO)
+    def test_non_updated_reserve_seats_user_select_seat_postion_overflow(self, mock_stdout, mock_input):
+        mock_input.side_effect = ['B3', BreakOutOfLoop()]
+        num_tickets = 8
+        c = cinema.Cinema('mock_updated_movie', 3, 3)
+
+        with self.assertRaises(BreakOutOfLoop):
+            c.reserve_seats(num_tickets)
+        std_out = mock_stdout.getvalue().split('\n')
+        self.assertIn(
+            'Sorry, there are only 4 seats available from the selected position.', std_out)
+
+    @patch("builtins.input")
+    @patch("sys.stdout", new_callable=StringIO)
+    def test_updated_reserve_seats_user_select_seat_postion_overflow(self, mock_stdout, mock_input):
+        mock_input.side_effect = ['B3', BreakOutOfLoop()]
+        num_tickets = 8
+        c = cinema.Cinema('mock_updated_movie', 3, 3, updated=True)
+
+        with self.assertRaises(BreakOutOfLoop):
+            c.reserve_seats(num_tickets)
+        std_out = mock_stdout.getvalue().split('\n')
+        self.assertNotIn(
+            'Sorry, there are only 4 seats available from the selected position.', std_out)
+
     def test_selected_seat_generate_reserve_seat_mapping(self):
+        num_tickets = 4
+        selected_row = 1
+        selected_col = 2
+        select_seats_check = [(1, 2), (0, 1), (0, 0), (0, 2)]
+        seat_mapping_check = [
+            ['o', 'o', 'o'],
+            ['.', '.', 'o'],
+            ['.', '.', '.']
+        ]
+        c = cinema.Cinema('Small', 3, 3)
+
+        results = c.selected_seat_generate_reserve_seat_mapping(
+            num_tickets, selected_row, selected_col)
+        self.assertEqual((select_seats_check, seat_mapping_check), results)
+
+    def test_non_updated_selected_seat_generate_reserve_seat_mapping(self):
+        num_tickets = 5
+        selected_row = 1
+        selected_col = 2
+
+        c = cinema.Cinema('Small', 3, 3)
+        with self.assertRaises(NotEnoughSeatsException):
+            c.selected_seat_generate_reserve_seat_mapping(
+                num_tickets, selected_row, selected_col)
+
+    def test_updated_selected_seat_generate_reserve_seat_mapping(self):
         num_tickets = 5
         selected_row = 1
         selected_col = 2
         select_seats_check = [(1, 2), (0, 1), (0, 0), (0, 2), (2, 1)]
+
         seat_mapping_check = [
             ['o', 'o', 'o'],
             ['.', '.', 'o'],
             ['.', 'o', '.']
         ]
-        c = cinema.Cinema('Small', 3, 3)
 
+        c = cinema.Cinema('Small', 3, 3, updated=True)
         results = c.selected_seat_generate_reserve_seat_mapping(
             num_tickets, selected_row, selected_col)
         self.assertEqual((select_seats_check, seat_mapping_check), results)
@@ -135,7 +201,7 @@ class TestCinema(unittest.TestCase):
         ]
         results = c.generate_booking_id_seat_mapping(mock_booking_id)
         self.assertEqual(seat_mapping_check, results)
-        
+
     def test_display_seating(self):
         c = cinema.Cinema('Small', 3, 3)
         mock_seat_mapping = [

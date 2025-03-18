@@ -11,7 +11,7 @@
 Each individual function have only one task.
 2. This project is also build with both OOP and functional programming in mind. 
 
-### Assumptions
+## Assumptions
 1. The movie title can only be one word.
 2. When all of the seats are booked and the user choose option 1, it should immediately reject the option and notify the user that there are no more seats.
 3. At the seat selection stage, there are no way back to the main menu.
